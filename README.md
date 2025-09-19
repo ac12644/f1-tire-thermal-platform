@@ -1,6 +1,9 @@
+[![Tests](https://github.com/ac12644/f1-tire-temp-prototype/actions/workflows/python-tests.yml/badge.svg)](https://github.com/ac12644/f1-tire-temp-prototype/actions)
+
 # F1 Tire Temperature Management Prototype
 
-This document explains the architecture, modules, and testing approach for the **F1-style Tire Temperature Management** prototype.
+Prototype for simulating and managing **F1-style tire temperatures** using Python, Streamlit, and Extended Kalman Filtering.  
+Includes live telemetry simulation, pit stop logic, compound switching, decision engine, and modelpacks for different tracks.
 
 ---
 
