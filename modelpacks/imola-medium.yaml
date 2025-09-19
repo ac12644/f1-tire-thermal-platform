@@ -1,0 +1,13 @@
+name: Imola FP3 (Medium)
+compound: medium
+ambient_c: 20.0
+track_c: 27.0
+a1: 0.0018
+a2: 0.00080
+a3: 0.11
+a4: 0.08
+a5: 0.040
+b1: 0.070
+b2: 0.092
+c1: 0.012
+c2: 0.030

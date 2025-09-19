@@ -1,0 +1,13 @@
+name: Monza FP2 (Medium)
+compound: medium
+ambient_c: 29.0
+track_c: 43.0
+a1: 0.0019
+a2: 0.00085
+a3: 0.11
+a4: 0.09
+a5: 0.045
+b1: 0.070
+b2: 0.095
+c1: 0.013
+c2: 0.030

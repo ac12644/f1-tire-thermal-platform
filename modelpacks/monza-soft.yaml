@@ -1,0 +1,13 @@
+name: Monza FP2 (Soft)
+compound: soft
+ambient_c: 30.0
+track_c: 46.0
+a1: 0.0020
+a2: 0.00090
+a3: 0.11
+a4: 0.10
+a5: 0.050
+b1: 0.070
+b2: 0.095
+c1: 0.013
+c2: 0.030

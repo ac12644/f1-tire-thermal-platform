@@ -1,0 +1,13 @@
+name: Singapore Night (Wet)
+compound: medium
+ambient_c: 28.0
+track_c: 31.0
+a1: 0.0015
+a2: 0.00070
+a3: 0.12
+a4: 0.07
+a5: 0.060 # more cooling (spray/airflow effect)
+b1: 0.065
+b2: 0.090
+c1: 0.012
+c2: 0.028

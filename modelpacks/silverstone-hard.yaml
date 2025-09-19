@@ -1,0 +1,13 @@
+name: Silverstone Race (Hard)
+compound: hard
+ambient_c: 22.0
+track_c: 30.0
+a1: 0.0017
+a2: 0.00080
+a3: 0.10
+a4: 0.08
+a5: 0.042
+b1: 0.075
+b2: 0.100
+c1: 0.012
+c2: 0.031
