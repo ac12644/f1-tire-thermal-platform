@@ -1,4 +1,4 @@
-[![Tests](https://github.com/ac12644/f1-tire-temp-prototype/actions/workflows/python-tests.yml/badge.svg)](https://github.com/ac12644/f1-tire-temp-prototype/actions)
+[![Tests](https://github.com/ac12644/f1-tire-temp-prototype/actions/workflows/tests.yml/badge.svg)](https://github.com/ac12644/f1-tire-temp-prototype/actions/workflows/tests.yml)
 
 # F1 Tire Temperature Management Prototype
 
