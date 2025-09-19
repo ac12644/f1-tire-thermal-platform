@@ -1,3 +1,4 @@
+# src/app_streamlit.py
 
 from __future__ import annotations
 import time
@@ -19,7 +20,9 @@ from modelpack import ModelPack
 from pressure import suggest_pressure_delta
 from events import detect_lockup, detect_slide
 
+# -------------------------------------------------------------------
 # Page config MUST be first Streamlit command
+# -------------------------------------------------------------------
 st.set_page_config(page_title="🏎️ F1-Style Tire Temperature Management – Prototype", layout="wide")
 st.title("🏎️ F1-Style Tire Temperature Management – Prototype")
 
@@ -42,7 +45,9 @@ html(
     height=0,
 )
 
-# --------- Session helpers ---------
+# -------------------------------------------------------------------
+# Session helpers
+# -------------------------------------------------------------------
 def init_session():
     params = ThermalParams()
     model = ThermalModel(params)
@@ -63,12 +68,15 @@ def ensure_session():
 
 ensure_session()
 
-# --------- Sidebar controls (English only) ---------
+# -------------------------------------------------------------------
+# Sidebar controls
+# -------------------------------------------------------------------
 st.sidebar.header("Controls")
 view = st.sidebar.radio("View", ["Live", "What-If", "Session", "Export"], index=0, key="view")
 compound = st.sidebar.selectbox("Compound", ["soft", "medium", "hard"], index=1, key="compound")
 dt = st.sidebar.slider("Tick interval (s)", 0.1, 1.0, 0.2, 0.1, key="dt")
 run_toggle = st.sidebar.toggle("Run (auto-update only in Live)", value=True, key="run")
+freeze = st.sidebar.toggle("Freeze updates (view details)", value=False, key="freeze")
 reset = st.sidebar.button("Reset session", use_container_width=True)
 step_once = st.sidebar.button("Step once", use_container_width=True)
 pit_now = st.sidebar.button("Pit stop (switch compound)", use_container_width=True)
@@ -76,28 +84,29 @@ st.sidebar.markdown("---")
 wake = st.sidebar.slider("Wake (downforce loss %)", 0, 40, 0, 5)
 wet = st.sidebar.slider("Wet track %", 0, 100, 0, 10)
 
-# Effective Run (do not mutate the widget state)
-run = bool(st.session_state.get("run", False)) and (view == "Live")
+# Effective Run (do not mutate the widget state); pause when frozen
+run = bool(st.session_state.get("run", False)) and (view == "Live") and not st.session_state.get("freeze", False)
 
 # Reset session if requested
 if reset:
     init_session()
 
-# Keep compound_active in sync with dropdown (safe: doesn't mutate widget)
+# Keep compound_active in sync with dropdown (only when user changes it)
 if "_compound_widget_last" not in st.session_state:
     st.session_state._compound_widget_last = st.session_state.get("compound", "medium")
 if "compound_active" not in st.session_state:
     st.session_state.compound_active = st.session_state.get("compound", "medium")
 
 compound_widget = st.session_state.get("compound", "medium")
-# Only update active compound if the widget changed since last run
 if compound_widget != st.session_state._compound_widget_last:
     st.session_state.compound_active = compound_widget
     st.session_state._compound_widget_last = compound_widget
 
 compound_active = st.session_state.compound_active
 
-# --------- Modelpack expander (presets + upload + download) ---------
+# -------------------------------------------------------------------
+# Modelpack expander (presets + upload + download)
+# -------------------------------------------------------------------
 with st.sidebar.expander("Modelpack"):
     mp_dir = (Path(__file__).resolve().parent.parent / "modelpacks")
     mp_dir.mkdir(parents=True, exist_ok=True)
@@ -112,7 +121,7 @@ with st.sidebar.expander("Modelpack"):
             mp = ModelPack.from_yaml(mp_path.read_text(encoding="utf-8"))
             # apply without touching the 'compound' widget key
             st.session_state.compound_active = mp.compound
-            st.session_state._compound_widget_last = st.session_state.get("compound", "medium")  # <-- add this
+            st.session_state._compound_widget_last = st.session_state.get("compound", "medium")  # prevent immediate resync
             compound_active = mp.compound
             st.session_state.sim.ambient = mp.ambient_c
             st.session_state.sim.track = mp.track_c
@@ -120,7 +129,6 @@ with st.sidebar.expander("Modelpack"):
             st.success(f"Modelpack applied: {mp.name}")
         except Exception as e:
             st.error(f"Error loading preset: {e}")
-
 
     uploaded = st.file_uploader("Upload custom YAML", type=["yml","yaml"], key="mp_upload")
     if uploaded is not None:
@@ -136,7 +144,6 @@ with st.sidebar.expander("Modelpack"):
         except Exception as e:
             st.error(f"YAML parse error: {e}")
 
-
     st.markdown("---")
     # Download current snapshot
     p = st.session_state.model.p
@@ -151,11 +158,14 @@ with st.sidebar.expander("Modelpack"):
     st.download_button("Download current modelpack", data=snap.to_yaml().encode("utf-8"),
                        file_name=default_name, mime="text/yaml", key="dl_mp_btn")
 
-
-# --------- Engine uses active compound ---------
+# -------------------------------------------------------------------
+# Engine uses active compound
+# -------------------------------------------------------------------
 engine = DecisionEngine(compound_active)
 
-# --------- Pit stop (cycle compound_active only) ---------
+# -------------------------------------------------------------------
+# Pit stop (cycle compound_active only)
+# -------------------------------------------------------------------
 def apply_pit_stop():
     order = ["soft", "medium", "hard"]
     current = st.session_state.compound_active
@@ -169,7 +179,9 @@ if pit_now:
     engine = apply_pit_stop()
     compound_active = st.session_state.compound_active
 
-# --------- One simulation tick with wake/wet & event detection ---------
+# -------------------------------------------------------------------
+# One simulation tick with wake/wet & event detection
+# -------------------------------------------------------------------
 def tick(dt: float):
     u_common, loads, sensors = st.session_state.sim.step(dt)
 
@@ -208,7 +220,9 @@ est_now = {}
 if (view == "Live" and run) or step_once:
     est_now = tick(st.session_state.dt)
 
-# --------- Helpers ---------
+# -------------------------------------------------------------------
+# Helpers
+# -------------------------------------------------------------------
 def last_hist(n=240):
     out = {}
     for c in CORNER_KEYS:
@@ -216,21 +230,21 @@ def last_hist(n=240):
         out[c] = h if len(h) else np.zeros((0,3))
     return out
 
-# --------- Views ---------
+# -------------------------------------------------------------------
+# Views
+# -------------------------------------------------------------------
 if view == "Live":
-    left, right = st.columns([2, 1])
+    # Wider left column for charts; right column uses tabs to avoid scrolling
+    left, right = st.columns([3, 2])
 
     chart_tread = left.empty()
     chart_carcass = left.empty()
-    recs_box = left.container()
-
-    track_card = right.empty()
-    metrics_card = right.empty()
+    tab_status, tab_recs, tab_metrics = right.tabs(["Status", "Recommendations", "Metrics"])
 
     lo, hi = engine.band
     H = last_hist(240)
 
-    # Tread
+    # Tread chart (shorter height to fit above the fold)
     fig_tread = go.Figure()
     for c in CORNER_KEYS:
         h = H[c]
@@ -238,59 +252,62 @@ if view == "Live":
             fig_tread.add_trace(go.Scatter(y=h[:,0], mode="lines", name=f"{c} Tread"))
     band_label = f"{compound_active.title()} band"
     fig_tread.add_hrect(y0=lo, y1=hi, fillcolor="LightGreen", opacity=0.2, line_width=0)
-    fig_tread.update_layout(height=340, title=f"Tread Temperature (last ~240 ticks) • {band_label}", xaxis_title="Tick", yaxis_title="°C")
+    fig_tread.update_layout(height=260, title=f"Tread Temperature (last ~240 ticks) • {band_label}", xaxis_title="Tick", yaxis_title="°C")
     chart_tread.plotly_chart(fig_tread, use_container_width=True)
 
-    # Carcass
+    # Carcass chart
     fig_carc = go.Figure()
     for c in CORNER_KEYS:
         h = H[c]
         if len(h):
             fig_carc.add_trace(go.Scatter(y=h[:,1], mode="lines", name=f"{c} Carcass"))
-    fig_carc.update_layout(height=300, title="Carcass Temperature (last ~240 ticks)", xaxis_title="Tick", yaxis_title="°C")
+    fig_carc.update_layout(height=220, title="Carcass Temperature (last ~240 ticks)", xaxis_title="Tick", yaxis_title="°C")
     chart_carcass.plotly_chart(fig_carc, use_container_width=True)
 
-    # Recommendations
+    # Track status (tab)
+    with tab_status:
+        corner_xy = {"FL": (0.2, 0.8), "FR": (0.8, 0.8), "RL": (0.2, 0.2), "RR": (0.8, 0.2)}
+        fig_track = go.Figure()
+        xs, ys, texts, colors = [], [], [], []
+        for c in CORNER_KEYS:
+            h = H[c]
+            if len(h):
+                t = h[-1, 0]
+                status = "HOT" if t > hi else ("COLD" if t < lo else "OK")
+            else:
+                status = "OK"
+            color = {"HOT":"red", "COLD":"blue", "OK":"green"}[status]
+            xs.append(corner_xy[c][0]); ys.append(corner_xy[c][1])
+            texts.append(f"{c}: {status}")
+            colors.append(color)
+        fig_track.add_trace(go.Scatter(x=xs, y=ys, mode="markers+text", text=texts, textposition="top center",
+                                       marker=dict(size=18, color=colors)))
+        fig_track.update_xaxes(visible=False); fig_track.update_yaxes(visible=False)
+        fig_track.update_layout(height=240, title="Corner Status (demo track)", showlegend=False)
+        st.plotly_chart(fig_track, use_container_width=True)
+
+    # Recommendations (tab)
     actions = engine.actions(est_now) if est_now else []
-    with recs_box:
+    with tab_recs:
         st.subheader("Recommendations")
         if actions:
-            for c, msg in actions[:8]:
-                st.write(f"**{c}** - {msg}")
+            for c, msg in actions[:12]:
+                st.write(f"**{c}** — {msg}")
         else:
             st.write("_No recommendations yet. Start the simulation or step once._")
 
-    # Mini track status
-    corner_xy = {"FL": (0.2, 0.8), "FR": (0.8, 0.8), "RL": (0.2, 0.2), "RR": (0.8, 0.2)}
-    fig_track = go.Figure()
-    xs, ys, texts, colors = [], [], [], []
-    for c in CORNER_KEYS:
-        h = H[c]
-        if len(h):
-            t = h[-1, 0]
-            status = "HOT" if t > hi else ("COLD" if t < lo else "OK")
-        else:
-            status = "OK"
-        color = {"HOT":"red", "COLD":"blue", "OK":"green"}[status]
-        xs.append(corner_xy[c][0]); ys.append(corner_xy[c][1])
-        texts.append(f"{c}: {status}")
-        colors.append(color)
-    fig_track.add_trace(go.Scatter(x=xs, y=ys, mode="markers+text", text=texts, textposition="top center", marker=dict(size=18, color=colors)))
-    fig_track.update_xaxes(visible=False); fig_track.update_yaxes(visible=False)
-    fig_track.update_layout(height=260, title="Corner Status (demo track)", showlegend=False)
-    track_card.plotly_chart(fig_track, use_container_width=True)
-
-    # Metrics (render as real table)
-    def temp_stats(h):
-        if not len(h): return (np.nan, np.nan, 0, 0)
-        t = h[:,0]
-        return (float(np.nanmax(t)), float(np.nanmean(t)), int(np.sum(t>hi)), int(np.sum(t<lo)))
-    rows = []
-    for c in CORNER_KEYS:
-        mx, av, over, under = temp_stats(H[c]); rows.append((c, mx, av, over, under))
-    cols = ["Corner","Max T(°C)","Avg T(°C)","Ticks > band","Ticks < band"]
-    df = pd.DataFrame([(c, round(mx,1), round(av,1), over, under) for (c, mx, av, over, under) in rows], columns=cols)
-    metrics_card.dataframe(df.set_index(cols[0]), use_container_width=True)
+    # Metrics table (tab)
+    with tab_metrics:
+        def temp_stats(h):
+            if not len(h): return (np.nan, np.nan, 0, 0)
+            t = h[:,0]
+            return (float(np.nanmax(t)), float(np.nanmean(t)), int(np.sum(t>hi)), int(np.sum(t<lo)))
+        rows = []
+        for c in CORNER_KEYS:
+            mx, av, over, under = temp_stats(H[c]); rows.append((c, mx, av, over, under))
+        cols = ["Corner","Max T(°C)","Avg T(°C)","Ticks > band","Ticks < band"]
+        df = pd.DataFrame([(c, round(mx,1), round(av,1), over, under) for (c, mx, av, over, under) in rows], columns=cols)
+        st.dataframe(df.set_index(cols[0]), use_container_width=True, height=240)
 
 elif view == "What-If":
     st.subheader("What-If Simulator (1 lap forward)")
@@ -317,11 +334,11 @@ elif view == "What-If":
         model = st.session_state.model
         sim = st.session_state.sim
         dt_sim = st.session_state.dt
-    
+
         # seed with last estimated state
         est0 = {c: (st.session_state.hist[c][-1].copy() if len(st.session_state.hist[c]) else np.array([95.,90.,85.])) for c in CORNER_KEYS}
         traj = {c: [est0[c].copy()] for c in CORNER_KEYS}
-    
+
         t0 = sim.t  # current live sim time
         for k in range(1, horizon+1):
             u_common, loads = sim.snapshot_controls(t0 + k*dt_sim)
@@ -330,12 +347,10 @@ elif view == "What-If":
                 u["brake"] = u["brake"]*bias_k
                 u["slip"] = max(0.0, u["slip"]*diff_k)
                 u["speed_kmh"] = u["speed_kmh"]*push_k
-                # carry over any cooling factor logic from live if you want (optional):
                 u["cooling_factor"] = u.get("cooling_factor", 1.0)
                 x = model.step(traj[c][-1], u, dt_sim)
                 traj[c].append(x)
         return {c: np.vstack(traj[c]) for c in CORNER_KEYS}
-
 
     # Pressure planner (carcass temps across corners)
     N = 120
@@ -393,7 +408,9 @@ elif view == "Export":
     csv_bytes = make_csv(export_ticks)
     st.download_button("Download CSV", data=csv_bytes, file_name="tire_temps.csv", mime="text/csv")
 
-# Auto-rerun only in Live and when Run is enabled
+# -------------------------------------------------------------------
+# Auto-rerun only in Live and when Run is enabled (and not frozen)
+# -------------------------------------------------------------------
 if view == "Live" and run and not step_once:
     time.sleep(st.session_state.dt)
     try:
