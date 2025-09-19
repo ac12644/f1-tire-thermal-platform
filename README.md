@@ -13,7 +13,50 @@ Includes live telemetry simulation, pit stop logic, compound switching, decision
 
 ---
 
-## 1. Overview
+## Why Tires Matter
+
+- The **only thing** connecting the car to the track = 4 small rubber
+  patches.
+- Tires must stay in their **optimal temperature window** for max
+  grip.
+  - Too cold → stiff, low grip.
+  - Too hot → greasy, fast wear.
+
+---
+
+## Physics Basics
+
+We model the tire as **three thermal nodes**:
+
+1.  **Tread (Tt)** -- outer rubber, heats fast from sliding/braking,
+    cools quickly in airflow.
+2.  **Carcass (Tc)** -- tire structure, warms slower, key for grip and
+    stiffness.
+3.  **Rim (Tr)** -- metal wheel, heated by brakes, conducts heat to/from
+    tire.
+
+Heat flows between layers + environment (air, track, wetness).
+
+---
+
+## The Sensor Problem
+
+- Real F1 cars can only measure:
+  - **TPMS IR sensors** → tread temp.
+  - **Hub sensors** → rim temp.
+- But **carcass temp (most important) is hidden!**
+
+---
+
+## Solution: Extended Kalman Filter (EKF)
+
+- Combines the **thermal physics model** with **noisy sensor data**.
+- Estimates hidden carcass temp.
+- Corrects the simulation when real data disagrees → "smart observer."
+
+---
+
+## Overview
 
 The prototype simulates and monitors tire thermal behavior in a Formula 1 context.  
 It provides:
@@ -26,7 +69,7 @@ It provides:
 
 ---
 
-## 2. Modules
+## Modules
 
 ### `thermal.py`
 
@@ -81,7 +124,7 @@ It provides:
 
 ---
 
-## 3. Key Fixes
+## Key Fixes
 
 - **Scroll persistence**: small JS snippet saves/loads scroll position.
 - **Run toggle bug**: prevented auto-pause from mutating `session_state`.
@@ -92,7 +135,7 @@ It provides:
 
 ---
 
-## 4. Testing
+## Testing
 
 Located under `tests/` with **pytest**.
 
