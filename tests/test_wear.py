@@ -2,7 +2,8 @@ import numpy as np
 import pytest
 from wear import TireWearModel, WearParams
 from thermal import ThermalModel, ThermalParams
-from decision import DecisionEngine, GRIP_DEGRADATION_THRESHOLDS
+from decision import DecisionEngine
+from config import system_config
 
 def test_wear_model_initialization():
     """Test wear model initializes correctly with default parameters."""
@@ -214,13 +215,14 @@ def test_pit_window_prediction():
 
 def test_grip_degradation_thresholds():
     """Test grip degradation thresholds for different compounds."""
-    assert GRIP_DEGRADATION_THRESHOLDS["soft"] == 0.3
-    assert GRIP_DEGRADATION_THRESHOLDS["medium"] == 0.4
-    assert GRIP_DEGRADATION_THRESHOLDS["hard"] == 0.5
+    grip_thresholds = system_config.tire_config.grip_degradation_thresholds
+    assert grip_thresholds["soft"] == 0.3
+    assert grip_thresholds["medium"] == 0.4
+    assert grip_thresholds["hard"] == 0.5
     
     # Soft tires should degrade earliest, hard tires latest
-    assert GRIP_DEGRADATION_THRESHOLDS["soft"] < GRIP_DEGRADATION_THRESHOLDS["medium"]
-    assert GRIP_DEGRADATION_THRESHOLDS["medium"] < GRIP_DEGRADATION_THRESHOLDS["hard"]
+    assert grip_thresholds["soft"] < grip_thresholds["medium"]
+    assert grip_thresholds["medium"] < grip_thresholds["hard"]
 
 def test_wear_history_management():
     """Test wear history management and trimming."""

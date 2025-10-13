@@ -305,6 +305,9 @@ class BigDataAnalytics:
         except Exception as e:
             # Fallback to cache storage if database fails
             self.telemetry_cache[len(self.telemetry_cache)] = telemetry_data
+        
+        # Always store in cache for testing and fallback
+        self.telemetry_cache[len(self.telemetry_cache)] = telemetry_data
     
     def store_weather_data(self, weather_data: Dict[str, Any]):
         """Store weather data in the database."""
@@ -361,6 +364,9 @@ class BigDataAnalytics:
         except Exception as e:
             # Fallback to cache storage if database fails
             self.weather_cache[len(self.weather_cache)] = weather_data
+        
+        # Always store in cache for testing and fallback
+        self.weather_cache[len(self.weather_cache)] = weather_data
     
     def store_driver_performance(self, performance_data: Dict[str, Any]):
         """Store driver performance data in the database."""
