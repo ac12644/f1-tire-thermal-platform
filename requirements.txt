@@ -9,3 +9,5 @@ matplotlib==3.8.2
 seaborn==0.13.0
 aiohttp==3.9.1
 requests==2.31.0
+psutil==5.9.6
+joblib==1.3.2
