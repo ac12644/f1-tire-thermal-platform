@@ -1,54 +1,233 @@
-# =========================
-# Python / Build Artifacts
-# =========================
-__pycache__/
-src/__pycache__/
-tests/__pycache__/
-*.py[cod]
-*.pyo
-*.pyd
-*.so
-*.egg
-*.egg-info/
-.eggs/
-build/
-dist/
+# 🏎️ F1 Tire Thermal Platform - Git Ignore File
 
-# =========================
-# Virtual Environment
-# =========================
-.venv/
+# ===========================================
+# Python
+# ===========================================
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# ===========================================
+# Virtual Environments
+# ===========================================
+.env
+.venv
 env/
 venv/
 ENV/
+env.bak/
+venv.bak/
+.conda/
 
-# =========================
-# Logs & Caches
-# =========================
-*.log
-*.out
-*.err
+# ===========================================
+# IDE & Editor Files
+# ===========================================
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# ===========================================
+# Jupyter Notebooks
+# ===========================================
+.ipynb_checkpoints
+*.ipynb
+
+# ===========================================
+# Testing & Coverage
+# ===========================================
 .pytest_cache/
 .coverage
 htmlcov/
+.tox/
+.nox/
+coverage.xml
 *.cover
 *.py,cover
+.hypothesis/
 
-# =========================
-# IDE / Editor settings
-# =========================
-.vscode/
-.idea/
-*.iml
-
-# =========================
+# ===========================================
 # Streamlit
-# =========================
-.streamlit/secrets.toml
-.streamlit/config.toml
+# ===========================================
+.streamlit/
+streamlit_cache/
 
-# =========================
-# OS files
-# =========================
+# ===========================================
+# Data & Logs
+# ===========================================
+*.log
+logs/
+data/
+*.db
+*.sqlite
+*.sqlite3
+*.csv
+*.json
+*.pickle
+*.pkl
+*.h5
+*.hdf5
+
+# Generated reports and analytics
+reports/
+f1_analytics.db
+integration_tests.db
+reports.db
+
+# ===========================================
+# Model Files & Weights
+# ===========================================
+*.model
+*.weights
+*.ckpt
+*.pth
+*.pt
+models/
+checkpoints/
+
+# ===========================================
+# Configuration & Secrets
+# ===========================================
+config.ini
+secrets.json
+.env.local
+.env.production
+.env.staging
+*.key
+*.pem
+*.crt
+
+# ===========================================
+# Temporary Files
+# ===========================================
+tmp/
+temp/
+*.tmp
+*.temp
+*.bak
+*.backup
+
+# ===========================================
+# OS Generated Files
+# ===========================================
 .DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
 Thumbs.db
+desktop.ini
+
+# ===========================================
+# Documentation Build
+# ===========================================
+docs/_build/
+site/
+_site/
+
+# ===========================================
+# Package Managers
+# ===========================================
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# ===========================================
+# Docker
+# ===========================================
+.dockerignore
+docker-compose.override.yml
+
+# ===========================================
+# F1 Specific Files
+# ===========================================
+# Telemetry data files
+telemetry_*.csv
+telemetry_*.json
+race_data/
+session_data/
+
+# Model pack files (keep structure, ignore data)
+modelpacks/*/data/
+modelpacks/*/cache/
+
+# Simulation outputs
+simulation_results/
+race_simulations/
+strategy_outputs/
+
+# ===========================================
+# Development & Debug
+# ===========================================
+debug/
+debug_*.py
+test_output/
+*.debug
+
+# ===========================================
+# Performance Profiling
+# ===========================================
+*.prof
+*.cprof
+profile_results/
+
+# ===========================================
+# Backup Files
+# ===========================================
+*.orig
+*.rej
+*.swp
+*.swo
+*~
+
+# ===========================================
+# Large Files (>100MB)
+# ===========================================
+*.zip
+*.tar.gz
+*.rar
+*.7z
+
+# ===========================================
+# Keep Important Files
+# ===========================================
+!requirements.txt
+!requirements-dev.txt
+!pytest.ini
+!README.md
+!LICENSE
+!docs/
+!src/
+!tests/
+!img/
+!modelpacks/
+!.gitignore
