@@ -10,5 +10,12 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
-      - run: pip install -r requirements.txt -r requirements-dev.txt
-      - run: pytest -q
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+          pip install -r requirements-dev.txt
+      - name: Set Python path
+        run: |
+          echo "PYTHONPATH=$PWD:$PWD/src:$PYTHONPATH" >> $GITHUB_ENV
+      - name: Run tests
+        run: pytest -q

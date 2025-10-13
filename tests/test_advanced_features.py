@@ -11,16 +11,16 @@ import tempfile
 import shutil
 
 # Import Advanced Features components
-from src.simulation_engine import RaceSimulation, SimulationParams
-from src.strategy_optimization import StrategyOptimizer, StrategyOptimizationParams, StrategyChromosome
-from src.real_time_collaboration import (
+from simulation_engine import RaceSimulation, SimulationParams
+from strategy_optimization import StrategyOptimizer, StrategyOptimizationParams, StrategyChromosome
+from real_time_collaboration import (
     RealTimeCollaboration, CollaborationParams, TeamMember, CollaborationRole,
     DecisionType, Priority, DecisionStatus, CollaborationSession, Decision
 )
-from src.advanced_reporting import (
+from advanced_reporting import (
     ReportGenerator, ReportParams, ReportType, ReportFormat, Insight, InsightCategory
 )
-from src.integration_testing import (
+from integration_testing import (
     IntegrationTester, IntegrationTestParams, DataSource, TestType, TestStatus,
     DataQuality, F1DataConnector, WeatherDataConnector, DataValidator,
     PerformanceTester, AccuracyTester, TestResult
