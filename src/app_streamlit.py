@@ -302,10 +302,10 @@ freeze = st.sidebar.toggle("⏸️ Freeze Updates", value=False, key="freeze")
 # Action Buttons
 col1, col2 = st.sidebar.columns(2)
 with col1:
-    reset = st.button("🔄 Reset", width='stretch', help="Reset entire session")
-    step_once = st.button("⏭️ Step", width='stretch', help="Single simulation step")
+    reset = st.button("🔄 Reset", help="Reset entire session")
+    step_once = st.button("⏭️ Step", help="Single simulation step")
 with col2:
-    pit_now = st.button("🏁 Pit Stop", width='stretch', help="Switch tire compound")
+    pit_now = st.button("🏁 Pit Stop", help="Switch tire compound")
 
 st.sidebar.markdown("---")
 
@@ -385,7 +385,7 @@ with st.sidebar.expander("Modelpack"):
     default_idx = presets.index("monza-medium.yaml") if "monza-medium.yaml" in presets else (0 if presets else None)
     sel = st.selectbox("Select preset", presets if presets else ["<none>"], index=default_idx if default_idx is not None else 0, disabled=len(presets)==0, key="preset_select")
 
-    if len(presets) and st.button("Apply selected preset", width='stretch', key="apply_preset_btn"):
+    if len(presets) and st.button("Apply selected preset", key="apply_preset_btn"):
         try:
             mp_path = mp_dir / sel
             mp = ModelPack.from_yaml(mp_path.read_text(encoding="utf-8"))
@@ -660,7 +660,7 @@ if view == "Live":
             mx, av, over, under = temp_stats(H[c]); rows.append((c, mx, av, over, under))
         cols = ["Corner","Max T(°C)","Avg T(°C)","Ticks > band","Ticks < band"]
         df = pd.DataFrame([(c, round(mx,1), round(av,1), over, under) for (c, mx, av, over, under) in rows], columns=cols)
-        st.dataframe(df.set_index(cols[0]), width='stretch', height=240)
+        st.dataframe(df.set_index(cols[0]), height=240)
 
     # Wear analysis (tab)
     with tab_wear:
@@ -816,7 +816,7 @@ if view == "Live":
                 weather_df['time'] = weather_df['time'].round(1)
                 weather_df['rain_probability'] = weather_df['rain_probability'].apply(lambda x: f"{x:.1%}")
                 weather_df['rain_intensity'] = weather_df['rain_intensity'].apply(lambda x: f"{x:.1%}")
-                st.dataframe(weather_df, width='stretch', height=200)
+                st.dataframe(weather_df, height=200)
         else:
             st.write("_Weather modeling not available. Reset session to enable._")
 
@@ -923,7 +923,7 @@ if view == "Live":
             
             # Multi-driver simulation
             st.subheader("Multi-Driver Race Simulation")
-            if st.button("Run Race Simulation", width='stretch'):
+            if st.button("Run Race Simulation", ):
                 with st.spinner("Simulating multi-driver race..."):
                     # Get current conditions
                     weather_summary = st.session_state.weather_model.get_weather_summary() if hasattr(st.session_state, 'weather_model') else {}
@@ -996,7 +996,7 @@ if view == "Live":
                 st.metric("Weather Records", len(analytics.weather_cache))
                 st.metric("Driver Records", len(analytics.driver_cache))
             
-            if st.button("Generate Analytics Report", width='stretch'):
+            if st.button("Generate Analytics Report", ):
                 with st.spinner("Generating analytics report..."):
                     report = analytics.generate_performance_report()
                     st.session_state.analytics_report = report
@@ -1008,7 +1008,7 @@ if view == "Live":
                 st.json(st.session_state.analytics_report)
                 
                 # Add a button to clear the report
-                if st.button("Clear Report", width='stretch'):
+                if st.button("Clear Report", ):
                     del st.session_state.analytics_report
                     st.rerun()
         
@@ -1017,7 +1017,7 @@ if view == "Live":
         if hasattr(st.session_state, 'predictive_analytics'):
             pred_analytics = st.session_state.predictive_analytics
             
-            if st.button("Run Predictive Analysis", width='stretch'):
+            if st.button("Run Predictive Analysis", ):
                 with st.spinner("Running predictive analysis..."):
                     # Prepare thermal state (average across corners)
                     thermal_state = np.array([
@@ -1057,7 +1057,7 @@ if view == "Live":
                 st.info(f"Confidence: {prediction.get('confidence', 0):.2%}")
                 
                 # Add a button to clear the prediction
-                if st.button("Clear Prediction", width='stretch'):
+                if st.button("Clear Prediction", ):
                     del st.session_state.prediction_result
                     st.rerun()
         
@@ -1066,7 +1066,7 @@ if view == "Live":
         if hasattr(st.session_state, 'strategy_optimizer'):
             optimizer = st.session_state.strategy_optimizer
             
-            if st.button("Optimize Race Strategy", width='stretch'):
+            if st.button("Optimize Race Strategy", ):
                 with st.spinner("Optimizing race strategy..."):
                     # Create race context
                     race_context = {
@@ -1096,7 +1096,7 @@ if view == "Live":
                     st.write(f"- Driving style: {strategy.get('driving_style', 'N/A')}")
                 
                 # Add a button to clear the strategy results
-                if st.button("Clear Strategy Results", width='stretch'):
+                if st.button("Clear Strategy Results", ):
                     del st.session_state.strategy_result
                     st.rerun()
         
@@ -1105,7 +1105,7 @@ if view == "Live":
         if hasattr(st.session_state, 'data_insights'):
             insights = st.session_state.data_insights
             
-            if st.button("Generate Insights", width='stretch'):
+            if st.button("Generate Insights", ):
                 with st.spinner("Generating insights..."):
                     # Prepare performance data
                     performance_data = []
@@ -1161,7 +1161,7 @@ if view == "Live":
                     st.write("• No optimization insights available yet")
                 
                 # Add a button to clear the insights
-                if st.button("Clear Insights", width='stretch'):
+                if st.button("Clear Insights", ):
                     del st.session_state.insights_result
                     st.rerun()
         
@@ -1172,7 +1172,7 @@ if view == "Live":
             
             col1, col2 = st.columns(2)
             with col1:
-                if st.button("Generate Race Summary", width='stretch'):
+                if st.button("Generate Race Summary", ):
                     with st.spinner("Generating race summary..."):
                         report_content = report_gen.generate_race_summary()
                         st.success("Race summary report generated!")
@@ -1214,7 +1214,7 @@ if view == "Live":
                         )
             
             with col2:
-                if st.button("Generate Performance Analysis", width='stretch'):
+                if st.button("Generate Performance Analysis", ):
                     with st.spinner("Generating performance analysis..."):
                         report_content = report_gen.generate_performance_analysis()
                         st.success("Performance analysis report generated!")
@@ -1310,7 +1310,7 @@ elif view == "What-If":
     dpsi = suggest_pressure_delta(carcass_t=carc_all, target_band=engine.band)
     st.info(f"Box pressure suggestion: **{dpsi:+.1f} psi** (toward band center)")
 
-    if st.button("Run What-If", width='stretch'):
+    if st.button("Run What-If", ):
         W = simulate_forward(horizon_ticks)
         lo, hi = engine.band
         colw1, colw2 = st.columns(2)
